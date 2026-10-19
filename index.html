@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>拾光 · 你的生活存折</title>
+<meta name="description" content="拾光——零操作的生活存折。它默默读取你手机里的生活痕迹，酿成八本温暖的账本，让你看见自己的光。">
+<style>
+  :root{
+    --bg:#FFF9F3; --bg2:#FFF2E6; --bg3:#FFE9D6;
+    --ink:#3A2E25; --ink-soft:#93836f; --ink-faint:#b9ab9a;
+    --brand:#FF8A5B; --brand-d:#F2703F; --brand2:#FFB86B; --gold:#FFD89B;
+    --card:#ffffff; --line:#F0E4D8;
+    --love:#FF7A59; --grow:#4FC98F; --health:#7C86FF; --rel:#FF8FB1;
+    --thanks:#FF6B6B; --map:#3FB6E8; --time:#F5A623; --gift:#A97BFF;
+    --shadow:0 18px 50px -18px rgba(214,120,60,.35);
+    --shadow-s:0 8px 24px -10px rgba(214,120,60,.28);
+    --r:24px;
+    --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}
+  ::selection{background:var(--gold);color:var(--ink)}
+  section{position:relative;padding:96px 24px}
+  .wrap{max-width:1120px;margin:0 auto}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.14em;
+    color:var(--brand-d);background:rgba(255,138,91,.1);padding:7px 16px;border-radius:99px;margin-bottom:20px}
+  h2.sec{font-size:clamp(28px,4.6vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.25;margin-bottom:16px}
+  .sec-sub{font-size:clamp(15px,2vw,18px);color:var(--ink-soft);max-width:640px;margin-bottom:52px}
+  .hl{background:linear-gradient(transparent 62%,var(--gold) 62%);padding:0 2px;font-weight:800;color:var(--ink)}
+  .fade{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1)}
+  .fade.in{opacity:1;transform:none}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;transition:.4s;backdrop-filter:blur(0px)}
+  nav.stuck{background:rgba(255,249,243,.82);backdrop-filter:blur(18px);box-shadow:0 1px 0 var(--line);padding:11px 28px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:.02em}
+  .logo .dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand2),var(--brand));
+    display:grid;place-items:center;font-size:16px;box-shadow:var(--shadow-s)}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{color:var(--ink-soft);text-decoration:none;font-size:14.5px;font-weight:600;transition:.25s}
+  .navlinks a:hover{color:var(--brand-d)}
+  .nav-cta{background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff!important;padding:9px 20px;border-radius:99px;
+    box-shadow:var(--shadow-s);font-weight:700!important}
+  @media(max-width:820px){.navlinks a:not(.nav-cta){display:none}}
+
+  /* HERO */
+  #hero{min-height:100vh;display:flex;align-items:center;padding-top:120px;padding-bottom:60px;
+    background:
+      radial-gradient(900px 600px at 82% 8%,rgba(255,216,155,.55),transparent 60%),
+      radial-gradient(700px 520px at 8% 88%,rgba(255,143,177,.32),transparent 62%),
+      linear-gradient(160deg,#FFF9F3 0%,#FFF2E6 48%,#FFEAD9 100%);overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center}
+  @media(max-width:940px){.hero-grid{grid-template-columns:1fr;gap:44px;text-align:center}.hero-cta{justify-content:center}}
+  .hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--brand-d);
+    background:rgba(255,255,255,.7);border:1px solid rgba(255,138,91,.25);padding:7px 16px;border-radius:99px;margin-bottom:24px;
+    box-shadow:var(--shadow-s)}
+  h1{font-size:clamp(46px,9vw,92px);font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:8px}
+  h1 .g{background:linear-gradient(120deg,var(--brand),var(--brand2) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero-line{font-size:clamp(19px,3vw,27px);font-weight:700;line-height:1.5;margin:18px 0 14px;letter-spacing:-.01em}
+  .hero-desc{font-size:clamp(15px,2vw,17.5px);color:var(--ink-soft);max-width:520px;margin-bottom:34px}
+  @media(max-width:940px){.hero-desc{margin-left:auto;margin-right:auto}}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;padding:15px 30px;border-radius:99px;font-weight:700;font-size:16px;
+    text-decoration:none;cursor:pointer;border:none;transition:.3s;font-family:var(--font)}
+  .btn-p{background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;box-shadow:0 14px 34px -12px rgba(242,112,63,.7)}
+  .btn-p:hover{transform:translateY(-3px);box-shadow:0 20px 42px -12px rgba(242,112,63,.8)}
+  .btn-g{background:rgba(255,255,255,.8);color:var(--ink);border:1.5px solid var(--line);box-shadow:var(--shadow-s)}
+  .btn-g:hover{transform:translateY(-3px);border-color:var(--brand2)}
+  .hero-stats{display:flex;gap:30px;margin-top:44px;flex-wrap:wrap}
+  @media(max-width:940px){.hero-stats{justify-content:center}}
+  .hstat b{display:block;font-size:26px;font-weight:800;color:var(--brand-d);letter-spacing:-.02em}
+  .hstat span{font-size:13px;color:var(--ink-soft)}
+
+  /* PHONE */
+  .phone-hold{display:flex;justify-content:center;perspective:1400px}
+  .phone{width:296px;height:606px;background:#1c1512;border-radius:46px;padding:11px;position:relative;
+    box-shadow:0 40px 80px -26px rgba(120,60,20,.6),0 0 0 2px rgba(255,255,255,.5) inset;transform:rotateY(-9deg) rotateX(3deg);
+    animation:float 6.5s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:rotateY(-9deg) rotateX(3deg) translateY(0)}50%{transform:rotateY(-9deg) rotateX(3deg) translateY(-14px)}}
+  .phone.flat{transform:none;animation:none}
+  .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:118px;height:26px;background:#1c1512;
+    border-radius:0 0 17px 17px;z-index:20}
+  .screen{width:100%;height:100%;background:linear-gradient(170deg,#FFF7EF,#FFF0E4);border-radius:36px;overflow:hidden;position:relative;
+    display:flex;flex-direction:column}
+  .sbar{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:11.5px;font-weight:700;color:var(--ink);flex-shrink:0}
+  .sbody{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 16px 20px;scrollbar-width:none}
+  .sbody::-webkit-scrollbar{display:none}
+  .scr{animation:slidein .38s cubic-bezier(.2,.7,.3,1)}
+  @keyframes slidein{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+  .greet{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin:6px 2px 2px}
+  .greet b{display:block;font-size:20px;color:var(--ink);font-weight:800;margin-top:2px;letter-spacing:-.01em}
+  .yr-pill{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;
+    font-size:11px;font-weight:700;padding:6px 13px;border-radius:99px;margin:12px 2px 14px;box-shadow:var(--shadow-s);cursor:pointer}
+  .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mb{background:#fff;border-radius:17px;padding:14px 13px;box-shadow:0 6px 18px -10px rgba(180,110,60,.4);cursor:pointer;
+    transition:.25s;border:1px solid rgba(240,228,216,.7);position:relative;overflow:hidden}
+  .mb:active{transform:scale(.96)}
+  .mb .ic{font-size:23px;margin-bottom:7px;display:block}
+  .mb .nm{font-size:13.5px;font-weight:800;letter-spacing:-.01em}
+  .mb .sb{font-size:10.5px;color:var(--ink-faint);margin-top:2px;line-height:1.4}
+  .mb .bar{height:4px;border-radius:9px;margin-top:10px;background:#F1E7DC;overflow:hidden}
+  .mb .bar i{display:block;height:100%;border-radius:9px}
+
+  /* detail screen */
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;margin:6px 2px 12px}
+  .d-hero{border-radius:20px;padding:20px 18px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow-s)}
+  .d-hero .big{font-size:15px;font-weight:800;opacity:.95;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .d-hero .big .e{font-size:26px}
+  .d-hero .num{font-size:34px;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin:8px 0 2px}
+  .d-hero .cap{font-size:12px;opacity:.92;font-weight:600}
+  .d-hero::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.16)}
+  .d-text{font-size:14px;line-height:1.75;color:var(--ink);margin:16px 4px;font-weight:500}
+  .d-text b{color:var(--brand-d);font-weight:800}
+  .d-metrics{display:flex;gap:9px;margin:14px 2px}
+  .d-metrics .m{flex:1;background:#fff;border-radius:14px;padding:11px 8px;text-align:center;box-shadow:0 5px 15px -9px rgba(180,110,60,.45);border:1px solid var(--line)}
+  .d-metrics .m b{display:block;font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .d-metrics .m span{font-size:10px;color:var(--ink-faint);font-weight:600}
+  .invite{background:linear-gradient(135deg,#FFF6EC,#FFEFE0);border:1px dashed var(--brand2);border-radius:16px;padding:14px 15px;margin:14px 2px;font-size:13px;color:#8a5a34;line-height:1.65}
+  .invite b{color:var(--brand-d)}
+  .invite .act{display:inline-block;margin-top:9px;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;font-size:12px;font-weight:700;padding:8px 16px;border-radius:99px;cursor:pointer;box-shadow:var(--shadow-s)}
+  .share-btn{width:100%;margin-top:8px;background:#fff;border:1.5px solid var(--line);color:var(--ink);font-weight:700;font-size:13px;padding:12px;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+
+  /* SECTIONS shared */
+  .card{background:var(--card);border-radius:var(--r);padding:30px;box-shadow:var(--shadow);border:1px solid var(--line)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+
+  /* PAIN */
+  #pain{background:linear-gradient(180deg,var(--bg),#fff)}
+  .pain-quote{font-size:clamp(21px,3.4vw,31px);font-weight:800;line-height:1.5;letter-spacing:-.01em;max-width:820px;margin-bottom:46px}
+  .flaw{display:flex;gap:16px;align-items:flex-start;padding:18px 0;border-bottom:1px solid var(--line)}
+  .flaw:last-child{border:none}
+  .flaw .x{flex-shrink:0;width:34px;height:34px;border-radius:11px;background:rgba(255,107,107,.12);color:#e05a5a;display:grid;place-items:center;font-weight:800;font-size:15px}
+  .flaw b{display:block;font-size:15.5px;margin-bottom:2px}
+  .flaw p{font-size:14px;color:var(--ink-soft)}
+  .gap-note{margin-top:34px;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;border-radius:var(--r);padding:26px 30px;font-size:17px;font-weight:700;line-height:1.6;box-shadow:var(--shadow)}
+
+  /* INSIGHT */
+  #insight{background:linear-gradient(160deg,#FFF2E6,#FFEAD9)}
+  .rev{position:relative;overflow:hidden}
+  .rev .n{font-size:13px;font-weight:800;color:var(--brand);letter-spacing:.1em}
+  .rev h3{font-size:20px;font-weight:800;margin:10px 0 12px;letter-spacing:-.01em;line-height:1.4}
+  .rev .from{color:var(--ink-faint);text-decoration:line-through;font-weight:600;font-size:14px}
+  .rev .to{color:var(--brand-d);font-weight:800}
+  .rev p{font-size:14.5px;color:var(--ink-soft);margin-top:12px}
+
+  /* BOOKS */
+  .books-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  @media(max-width:960px){.books-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.books-grid{grid-template-columns:1fr}}
+  .book{background:#fff;border-radius:20px;padding:24px 20px;box-shadow:var(--shadow-s);border:1px solid var(--line);transition:.35s;cursor:pointer;position:relative;overflow:hidden}
+  .book::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+  .book:hover{transform:translateY(-7px);box-shadow:var(--shadow)}
+  .book .bic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;margin-bottom:14px;background:var(--csoft)}
+  .book h4{font-size:17px;font-weight:800;margin-bottom:3px}
+  .book .bsub{font-size:12px;color:var(--ink-faint);margin-bottom:12px;font-weight:600}
+  .book p{font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+  .book .peek{font-size:12.5px;color:var(--brand-d);font-weight:700;margin-top:12px;display:inline-flex;align-items:center;gap:4px}
+
+  /* DEMO */
+  #demo{background:radial-gradient(800px 500px at 50% 0%,#FFF3E8,transparent 70%),linear-gradient(180deg,#fff,var(--bg))}
+  .demo-grid{display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center;justify-items:center}
+  @media(max-width:900px){.demo-grid{grid-template-columns:1fr;gap:38px}}
+  .demo-steps{max-width:440px}
+  .dstep{display:flex;gap:16px;padding:15px 0;align-items:flex-start;opacity:.45;transition:.4s;cursor:pointer}
+  .dstep.active{opacity:1}
+  .dstep .sn{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--line);color:var(--ink-soft);display:grid;place-items:center;font-weight:800;font-size:13px;transition:.3s}
+  .dstep.active .sn{background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;box-shadow:var(--shadow-s)}
+  .dstep b{font-size:15.5px;display:block;margin-bottom:2px}
+  .dstep p{font-size:13.5px;color:var(--ink-soft)}
+  .demo-hint{text-align:center;margin-top:26px;font-size:13px;color:var(--ink-soft);font-weight:600}
+  .demo-hint .tap{display:inline-block;animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+  /* WARMTH */
+  #warmth{background:linear-gradient(160deg,#FFF6EE,#FFEEE2)}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:18px;overflow:hidden;box-shadow:var(--shadow-s);margin-bottom:14px}
+  @media(max-width:620px){.cmp{grid-template-columns:1fr}}
+  .cmp .cold{background:#F4EFEA;padding:20px 22px;color:#9a8b7c}
+  .cmp .warm{background:linear-gradient(135deg,#FFF,#FFF6EC);padding:20px 22px}
+  .cmp .lbl{font-size:11px;font-weight:800;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .cmp .cold .lbl{color:#b0a090}
+  .cmp .warm .lbl{color:var(--brand-d)}
+  .cmp p{font-size:15px;line-height:1.6;font-weight:600}
+  .cmp .cold p{text-decoration:line-through;text-decoration-color:rgba(180,120,120,.5)}
+  .cmp .warm p{color:var(--ink)}
+  .rules{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px;justify-content:center}
+  .rule{background:#fff;border-radius:99px;padding:11px 22px;font-weight:700;font-size:14.5px;box-shadow:var(--shadow-s);border:1px solid var(--line)}
+  .rule.no{color:#c98a8a}.rule.yes{color:var(--grow)}
+
+  /* TECH */
+  #tech{background:linear-gradient(180deg,var(--bg),#fff)}
+  .moat{background:linear-gradient(135deg,#3A2E25,#5a4436);color:#fff;border-radius:var(--r);padding:36px;box-shadow:var(--shadow);margin-bottom:26px}
+  .moat h3{font-size:22px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+  .moat p{color:rgba(255,255,255,.82);font-size:15.5px;line-height:1.75}
+  .moat .hl2{color:var(--gold);font-weight:800}
+  .src-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.src-grid{grid-template-columns:1fr}}
+  .src{background:#fff;border-radius:16px;padding:20px;box-shadow:var(--shadow-s);border:1px solid var(--line)}
+  .src b{font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .src p{font-size:13px;color:var(--ink-soft)}
+  .privacy{margin-top:26px;background:rgba(79,201,143,.1);border:1px solid rgba(79,201,143,.3);border-radius:18px;padding:22px 26px;font-size:14.5px;color:#2f7a56;font-weight:600;line-height:1.7}
+
+  /* DIFF */
+  .diff-tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow-s)}
+  .diff-tbl th,.diff-tbl td{padding:15px 18px;text-align:left;font-size:14px;border-bottom:1px solid var(--line)}
+  .diff-tbl th{background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;font-weight:700;font-size:13.5px}
+  .diff-tbl td:first-child{font-weight:700}
+  .diff-tbl td:nth-child(2){color:var(--ink-faint)}
+  .diff-tbl td:last-child{color:var(--brand-d);font-weight:700}
+  .diff-tbl tr:last-child td{border:none}
+  @media(max-width:680px){.diff-tbl th,.diff-tbl td{padding:12px 11px;font-size:12.5px}}
+
+  /* SHARE demo cards */
+  .share-preview{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:40px}
+  .scard{width:230px;border-radius:22px;padding:26px 22px;color:#fff;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:.35s}
+  .scard:hover{transform:translateY(-8px) rotate(-1deg)}
+  .scard .se{font-size:34px;margin-bottom:12px}
+  .scard .snum{font-size:30px;font-weight:900;letter-spacing:-.02em;line-height:1.1}
+  .scard .stx{font-size:14px;font-weight:700;opacity:.95;margin-top:6px}
+  .scard .sfoot{margin-top:20px;font-size:11px;font-weight:700;opacity:.85;display:flex;align-items:center;gap:6px}
+  .scard::after{content:"";position:absolute;right:-40px;bottom:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.14)}
+
+  /* FOOTER */
+  footer{background:linear-gradient(160deg,#3A2E25,#4d3a2c);color:#fff;padding:80px 24px 50px;text-align:center}
+  .foot-quote{font-size:clamp(22px,4vw,34px);font-weight:800;line-height:1.5;max-width:760px;margin:0 auto 20px;letter-spacing:-.01em}
+  .foot-quote .g{background:linear-gradient(120deg,var(--gold),var(--brand2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .foot-sub{color:rgba(255,255,255,.6);font-size:15px;max-width:520px;margin:0 auto 40px}
+  .foot-logo{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:20px;margin-bottom:26px}
+  .foot-logo .dot{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand2),var(--brand));display:grid;place-items:center;font-size:18px}
+  .foot-meta{color:rgba(255,255,255,.35);font-size:12.5px;margin-top:40px;border-top:1px solid rgba(255,255,255,.1);padding-top:26px}
+
+  /* share modal */
+  .modal{position:fixed;inset:0;background:rgba(58,46,37,.55);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+  .modal.on{display:flex;animation:fadein .3s}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .modal-in{animation:pop .4s cubic-bezier(.2,.9,.3,1.2)}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal .close{position:absolute;top:22px;right:26px;color:#fff;font-size:30px;cursor:pointer;font-weight:300;line-height:1}
+  .modal-actions{display:flex;gap:12px;margin-top:20px;justify-content:center}
+  .mact{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);padding:10px 20px;border-radius:99px;font-weight:700;font-size:13.5px;cursor:pointer}
+  .mact.main{background:#fff;color:var(--ink)}
+  .toast{position:fixed;bottom:34px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:13px 26px;border-radius:99px;font-size:14px;font-weight:600;opacity:0;transition:.4s;z-index:300;pointer-events:none;box-shadow:0 12px 30px -8px rgba(0,0,0,.4)}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="logo"><span class="dot">🌅</span>拾光</div>
+  <div class="navlinks">
+    <a href="#pain">痛点</a>
+    <a href="#books">八大账本</a>
+    <a href="#demo">体验 Demo</a>
+    <a href="#tech">技术壁垒</a>
+    <a href="#demo" class="nav-cta">立即体验 →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="hero-tag">🏆 手机创新大赛作品 · 端侧 AI 生活洞察</span>
+      <h1>拾<span class="g">光</span></h1>
+      <div class="hero-line">你每天都在往生活里存东西。<br>年底打开，<span class="hl">看见你的光</span>。</div>
+      <p class="hero-desc">一款<b>零操作</b>的生活存折。它不要求你记录任何东西——只是默默读取你手机里已经在产生的生活痕迹，酿成八本温暖的账本，帮你看见自己的热爱、成长、和那些默默爱着你的人。</p>
+      <div class="hero-cta">
+        <a href="#demo" class="btn btn-p">📱 亲手体验 Demo</a>
+        <a href="#pain" class="btn btn-g">看它解决什么</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><b>0 次</b><span>需要你手动记录</span></div>
+        <div class="hstat"><b>8 本</b><span>温暖的生活账本</span></div>
+        <div class="hstat"><b>100%</b><span>端侧处理·数据不出手机</span></div>
+      </div>
+    </div>
+    <div class="phone-hold">
+      <div class="phone" id="heroPhone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="sbar"><span>9:41</span><span>拾光&nbsp;&nbsp;📶 🔋</span></div>
+          <div class="sbody" id="heroBody"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section id="pain">
+  <div class="wrap">
+    <div class="fade">
+      <span class="eyebrow">◆ 痛点</span>
+      <div class="pain-quote">所有 App 都在帮你<span style="color:var(--ink-faint)">「做更多」</span>——<br>没有一个，在帮你<span class="hl">「看见自己」</span>。</div>
+    </div>
+    <div class="grid2 fade">
+      <div class="card">
+        <h3 style="font-size:18px;font-weight:800;margin-bottom:16px">😮‍💨 现代人说不出的空</h3>
+        <div class="flaw"><div class="x">?</div><div><b>"这一年好像什么都没干就过去了"</b><p>忙碌却记不住自己活过的证据。</p></div></div>
+        <div class="flaw"><div class="x">?</div><div><b>"和爸妈、老朋友越来越远"</b><p>想联系，却总在"下次吧"里错过。</p></div></div>
+        <div class="flaw"><div class="x">?</div><div><b>"想坚持，却总也坚持不下来"</b><p>没有反馈的努力，最容易放弃。</p></div></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:18px;font-weight:800;margin-bottom:16px">🧩 现有方案为什么都不行</h3>
+        <div class="flaw"><div class="x">✕</div><div><b>屏幕时间 / 记账 / 运动 App</b><p>单一切片、冰冷数据、负面评判——制造焦虑。</p></div></div>
+        <div class="flaw"><div class="x">✕</div><div><b>年度 Wrapped（网易云/支付宝）</b><p>只有娱乐切片、一年一次、看完就结束、无行动。</p></div></div>
+        <div class="flaw"><div class="x">✕</div><div><b>日记 / 打卡 / 习惯 App</b><p>要用户高频主动记录，坚持率极低——劝退 90%。</p></div></div>
+      </div>
+    </div>
+    <div class="gap-note fade">💡 机会缺口：一款「零操作 + 全景 + 温暖 + 有行动闭环 + 可分享」的产品——<b>这个位置，市场上是空的。</b></div>
+  </div>
+</section>
+
+<!-- INSIGHT -->
+<section id="insight">
+  <div class="wrap">
+    <div class="fade"><span class="eyebrow">◆ 核心洞察</span>
+      <h2 class="sec">三个反转，让人"啊？为什么没人做过"</h2>
+      <p class="sec-sub">拾光的灵魂不在功能，而在视角。同样的数据，换一个视角，就能从让人焦虑变成让人被爱。</p>
+    </div>
+    <div class="grid3">
+      <div class="card rev fade"><div class="n">反转 01</div><h3>从「时间管理」<br>到「意义管理」</h3>
+        <p><span class="from">记录你花了多少时间</span> → <span class="to">看见什么在滋养你</span></p>
+        <p>时间对每个人都一样，但什么在悄悄点亮你、什么在消耗你，从没人为你算过这笔账。</p></div>
+      <div class="card rev fade"><div class="n">反转 02</div><h3>从「揭露亏欠」<br>到「看见拥有」</h3>
+        <p><span class="from">照妖镜：你健身 0 次</span> → <span class="to">聚光灯：你连续早睡 143 天</span></p>
+        <p>数据不变，视角决定它是让你焦虑，还是让你感到被爱。</p></div>
+      <div class="card rev fade"><div class="n">反转 03</div><h3>从「需要你记录」<br>到「我只负责看见」</h3>
+        <p><span class="from">又一个要打卡的 App</span> → <span class="to">你正常生活，它默默看见</span></p>
+        <p>零操作负担，是它能触达大众、而非只服务自律者的根本原因。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKS -->
+<section id="books">
+  <div class="wrap">
+    <div class="fade"><span class="eyebrow">◆ 产品主体</span>
+      <h2 class="sec">八本温暖的账本</h2>
+      <p class="sec-sub">全部被动读取、自动生成。点任意一本，跳到下方 Demo 看它真实的样子。</p>
+    </div>
+    <div class="books-grid" id="booksGrid"></div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="wrap">
+    <div class="fade" style="text-align:center"><span class="eyebrow">◆ 可交互演示</span>
+      <h2 class="sec">亲手点一点这台「拾光」</h2>
+      <p class="sec-sub" style="margin-left:auto;margin-right:auto">下面的手机是真的可以操作的——点开账本、读温暖文案、生成分享卡片、打开年度报告。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="phone flat fade" id="demoPhone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="sbar"><span>9:41</span><span>拾光&nbsp;&nbsp;📶 🔋</span></div>
+          <div class="sbody" id="demoBody"></div>
+        </div>
+      </div>
+      <div class="demo-steps fade">
+        <div class="dstep active" data-go="home"><div class="sn">1</div><div><b>打开「我的一年」</b><p>八本账本静静躺着，全部自动生成，你没记录过任何一条。</p></div></div>
+        <div class="dstep" data-go="grow"><div class="sn">2</div><div><b>点开成长账本</b><p>"今年你打了 67 次网球，从 2.5 到 3.5"——你的坚持第一次被量化看见。</p></div></div>
+        <div class="dstep" data-go="thanks"><div class="sn">3</div><div><b>点开感恩账本（情感爆点）</b><p>"妈妈给你打了 87 通电话，34 通你没接到——也许她也在等你。"</p></div></div>
+        <div class="dstep" data-go="act"><div class="sn">4</div><div><b>一键行动</b><p>它没停在让你感动，而是问："要不要给妈妈回个电话？"看见，然后行动。</p></div></div>
+        <div class="dstep" data-go="share"><div class="sn">5</div><div><b>生成分享卡片</b><p>把成就变成一张精美卡片，晒得出口、也想晒——这就是社交货币。</p></div></div>
+        <div class="demo-hint"><span class="tap">👆</span> 点左边的手机，或点这些步骤引导</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WARMTH -->
+<section id="warmth">
+  <div class="wrap">
+    <div class="fade" style="text-align:center"><span class="eyebrow">◆ 情绪价值</span>
+      <h2 class="sec">温暖，是产品的护城河</h2>
+      <p class="sec-sub" style="margin-left:auto;margin-right:auto">同样一份数据，怎么说，决定了它是让你焦虑，还是让你被爱。拾光选择后者。</p>
+    </div>
+    <div style="max-width:760px;margin:0 auto">
+      <div class="cmp fade"><div class="cold"><div class="lbl">❄️ 冰冷 / 谴责</div><p>你今年健身 0 次</p></div><div class="warm"><div class="lbl">☀️ 温暖 / 看见</div><p>今年你把时间，给了其他重要的事</p></div></div>
+      <div class="cmp fade"><div class="cold"><div class="lbl">❄️ 冰冷 / 谴责</div><p>你和妈妈疏远了</p></div><div class="warm"><div class="lbl">☀️ 温暖 / 看见</div><p>你和妈妈的联系少了些，也许她也在等你</p></div></div>
+      <div class="cmp fade"><div class="cold"><div class="lbl">❄️ 冰冷 / 谴责</div><p>你老婆付出比你多</p></div><div class="warm"><div class="lbl">☀️ 温暖 / 看见</div><p>你的家人在默默爱着你，这些值得被看见</p></div></div>
+      <div class="cmp fade"><div class="cold"><div class="lbl">❄️ 冰冷 / 谴责</div><p>你又刷了 5 小时手机</p></div><div class="warm"><div class="lbl">☀️ 温暖 / 看见</div><p>今年你在热爱的事上，花了 412 小时</p></div></div>
+      <div class="rules fade">
+        <span class="rule no">✕ 不评判</span><span class="rule no">✕ 不比较</span>
+        <span class="rule no">✕ 不制造焦虑</span><span class="rule yes">✓ 只看见和肯定</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech">
+  <div class="wrap">
+    <div class="fade"><span class="eyebrow">◆ 可落地性</span>
+      <h2 class="sec">非手机不可，别人抄不动</h2>
+      <p class="sec-sub">这正是它在「手机创新大赛」里最该被记住的价值。</p>
+    </div>
+    <div class="moat fade">
+      <h3>🏰 天然壁垒：系统级数据 + 端侧 AI</h3>
+      <p>拾光依赖的全是<span class="hl2">手机系统级数据</span>——相册、健康、位置、屏幕时间、通话、日历。这些是普通第三方 App 拿不到、<span class="hl2">只有手机厂商 / 系统级 App 能深度调用</span>的数据。再配合<span class="hl2">端侧大模型</span>做归因与温暖叙事，构成别人短期抄不动的护城河，也是端侧 AI 能力最好的展示场景。</p>
+    </div>
+    <div class="src-grid">
+      <div class="src fade"><b>📷 端侧多模态识别</b><p>相册场景 / 人物 / 事件识别，技术成熟，全程本地。</p></div>
+      <div class="src fade"><b>🧠 端侧 LLM 归因</b><p>把冷数据酿成温暖洞察与因果解释，可调用手机端侧大模型。</p></div>
+      <div class="src fade"><b>⏱️ 本地时序聚合</b><p>频率 / 趋势 / 同比计算，轻量，无需云端。</p></div>
+    </div>
+    <div class="src-grid" style="margin-top:16px">
+      <div class="src fade"><b>🚀 MVP 一周可跑通</b><p>先做「成长 + 健康 + 感恩」三本账，数据最易得、情感最强、最好分享。</p></div>
+      <div class="src fade"><b>🔌 无需用户录入</b><p>不依赖任何未成熟技术，不需要平台开放数据，全是手机已有能力。</p></div>
+      <div class="src fade"><b>📈 渐进扩展</b><p>验证闭环后，逐步补全八本账本与 AI 成长教练。</p></div>
+    </div>
+    <div class="privacy fade">🔒 <b>隐私即信任：</b>全部端侧处理，数据一步都不离开手机；一次授权可随时撤销；关系账本只统计通话频率/时长，<b>绝不读取通话内容与短信正文</b>；分享完全自愿。路演话术——"它比你自己更懂你的生活，但这些数据一步都不会离开你的手机。"</div>
+  </div>
+</section>
+
+<!-- DIFF + SHARE -->
+<section id="diff" style="background:linear-gradient(180deg,#fff,var(--bg))">
+  <div class="wrap">
+    <div class="fade"><span class="eyebrow">◆ 差异化 & 传播</span>
+      <h2 class="sec">不撞车，还自带裂变基因</h2>
+    </div>
+    <div style="overflow-x:auto" class="fade">
+      <table class="diff-tbl">
+        <tr><th>竞品</th><th>它做的</th><th>拾光的不同</th></tr>
+        <tr><td>屏幕时间 App</td><td>单讲时间、劝你少用</td><td>全景 + 温暖，讲"热爱"而非"浪费"</td></tr>
+        <tr><td>记账 App</td><td>单讲钱、花了多少</td><td>讲"钱背后的价值观和心意"</td></tr>
+        <tr><td>运动 App（Keep/Strava）</td><td>单讲运动数据</td><td>把运动放进"成长+健康+归因"全景</td></tr>
+        <tr><td>相册（Google Photos）</td><td>帮你找到那张照片</td><td>帮你发现记忆与空白</td></tr>
+        <tr><td>Wrapped（网易云/支付宝）</td><td>娱乐切片、一年一次</td><td>全景 + 每周更新 + 行动闭环</td></tr>
+        <tr><td>日记 / 打卡 App</td><td>需主动高频记录</td><td>零操作、被动生成</td></tr>
+        <tr><td>同学的旅拍三作品</td><td>旅行单场景</td><td>覆盖"完整的人生"</td></tr>
+      </table>
+    </div>
+    <div class="fade" style="text-align:center;margin-top:60px">
+      <h3 style="font-size:22px;font-weight:800;margin-bottom:8px">每一条洞察，都是一句想发朋友圈的话</h3>
+      <p style="color:var(--ink-soft);font-size:15px">晒成长和热爱，不尴尬；不排名，只互相点亮。</p>
+    </div>
+    <div class="share-preview" id="sharePreview"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-logo"><span class="dot">🌅</span>拾光</div>
+  <div class="foot-quote">让我们在年底打开它时，<br>能对自己说一句：<span class="g">"这一年，我认真活过。"</span></div>
+  <p class="foot-sub">你每天都在往生活里存东西。拾光，替你把这一年重新看见一遍。</p>
+  <a href="#hero" class="btn btn-p">↑ 回到顶部，再体验一次</a>
+  <div class="foot-meta">手机创新大赛参赛作品 · 路演演示页 v1.0 · 2026-10-19 · 本页所有数据均为演示样例</div>
+</footer>
+
+<!-- share modal -->
+<div class="modal" id="modal">
+  <span class="close" id="modalClose">×</span>
+  <div class="modal-in" style="text-align:center">
+    <div id="modalCard"></div>
+    <div class="modal-actions">
+      <span class="mact main" id="doShare">分享到朋友圈</span>
+      <span class="mact" id="doSave">保存图片</span>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- data: eight books ----------
+  var BOOKS = [
+    {id:"love", ic:"🔥", nm:"热爱账本", sub:"你的时间花在了什么上", c:"#FF7A59", cs:"rgba(255,122,89,.13)", pct:78,
+      num:"412 小时", cap:"今年花在热爱上的时间",
+      text:"今年你把 <b>412 小时</b> 给了真正喜欢的事：网球 87h、阅读 64h、跑步 52h……你还有 <b>23 个心流时段</b>，最长一次专注了 2 小时 40 分。",
+      metrics:[{n:"412h",l:"热爱时长"},{n:"23",l:"心流时段"},{n:"2h40m",l:"最长专注"}],
+      inv:"你上次拿起吉他，是 3 个月前了。", act:"这周末再弹一次？",
+      share:{e:"🔥",num:"412 小时",tx:"今年我花在热爱上的时间",bg:"linear-gradient(135deg,#FF9A6B,#FF6B4A)"}},
+    {id:"grow", ic:"🎾", nm:"成长账本", sub:"你在悄悄变厉害", c:"#4FC98F", cs:"rgba(79,201,143,.13)", pct:88,
+      num:"67 次", cap:"今年打网球的次数",
+      text:"今年你打网球 <b>67 次</b>，累计 87 小时，水平从 <b>2.5 提升到 3.5</b> 🎾。你坚持最久的习惯是<b>早睡，连续 143 天</b>。这些改变，都在悄悄重塑你。",
+      metrics:[{n:"67",l:"网球次数"},{n:"2.5→3.5",l:"水平提升"},{n:"143天",l:"连续早睡"}],
+      inv:"照这个节奏，年底你就能稳定在 4.0 了。", act:"看看我的训练轨迹",
+      share:{e:"🎾",num:"2.5 → 3.5",tx:"今年我打了 67 次网球",bg:"linear-gradient(135deg,#5FD89C,#37B87C)"}},
+    {id:"health", ic:"🌙", nm:"健康账本", sub:"你的身体在感谢你", c:"#7C86FF", cs:"rgba(124,134,255,.13)", pct:82,
+      num:"7.1 小时", cap:"平均睡眠（去年 6.2h）",
+      text:"今年你的睡眠从 <b>6.2 小时提升到 7.1 小时</b>，深睡比例 <b>+23%</b> 🌙；静息心率下降了 5。这些改变，可能和你开始每周打 3 次网球、11 点前睡觉有关。<b>你的身体在感谢你。</b>",
+      metrics:[{n:"+0.9h",l:"睡眠提升"},{n:"+23%",l:"深睡比例"},{n:"-5",l:"静息心率"}],
+      inv:"最近你的睡眠变浅了一点。", act:"也许和加班有关，安排一次休息？",
+      share:{e:"🌙",num:"6.2h → 7.1h",tx:"今年我的睡眠变好了，深睡 +23%",bg:"linear-gradient(135deg,#8B93FF,#636CF0)"}},
+    {id:"rel", ic:"💛", nm:"关系账本", sub:"谁和你更近了", c:"#FF8FB1", cs:"rgba(255,143,177,.14)", pct:70,
+      num:"87 次", cap:"今年和妈妈的通话",
+      text:"今年你和妈妈通话 <b>87 次</b>，累计 24 小时，最长一次聊了 42 分钟。有 <b>5 个人</b>今年和你更亲近了。你和老朋友小 A 也<b>重新联系上了</b>——从 3 年没说话，到今年见了 2 次面。",
+      metrics:[{n:"87次",l:"和妈妈通话"},{n:"24h",l:"累计时长"},{n:"5人",l:"更亲近了"}],
+      inv:"你和爸爸的通话今年少了些，也许他也在等你。", act:"今晚给爸爸打个电话？",
+      share:{e:"💛",num:"87 次",tx:"今年我和妈妈通话 87 次",bg:"linear-gradient(135deg,#FFA0BE,#FF7AA2)"}},
+    {id:"thanks", ic:"❤️", nm:"感恩账本", sub:"谁在默默爱着你", c:"#FF6B6B", cs:"rgba(255,107,107,.13)", pct:92,
+      num:"34 通", cap:"妈妈的电话，你没接到",
+      text:"今年你为家人做了 <b>156 顿饭</b>、接了 <b>34 次孩子</b>。同时，你的家人也在默默爱你：妈妈给你打了 <b>87 通电话，其中 34 通你没接到</b>；爸爸给你发的 23 条消息，你每条都回了；伴侣接了 96 次孩子。",
+      metrics:[{n:"156顿",l:"你做的饭"},{n:"87通",l:"妈妈来电"},{n:"34通",l:"你没接到"}],
+      inv:"这些默默的爱，值得被说一声谢谢。", act:"给妈妈回个电话？她上次说想听你讲讲工作",
+      share:{e:"❤️",num:"156 顿饭",tx:"今年我为家人做的饭 · 也被他们默默爱着",bg:"linear-gradient(135deg,#FF8080,#F25C5C)"}},
+    {id:"map", ic:"🗺️", nm:"足迹账本", sub:"你的世界有多大", c:"#3FB6E8", cs:"rgba(63,182,232,.13)", pct:64,
+      num:"12 个", cap:"今年去的新地方",
+      text:"今年你去了 <b>12 个新地方</b>，最远到了西藏 🏔️。你有 <b>8 个心灵据点</b>：那家咖啡店、那个公园、那条散步的路——它们是你安放自己的角落。",
+      metrics:[{n:"12个",l:"新地方"},{n:"西藏",l:"最远到达"},{n:"8个",l:"心灵据点"}],
+      inv:"你今年去海边，比去年少了一次。", act:"明年要不要再去一次？",
+      share:{e:"🗺️",num:"12 个新地方",tx:"今年我的足迹，最远到了西藏",bg:"linear-gradient(135deg,#54C4EE,#2FA6DC)"}},
+    {id:"time", ic:"📸", nm:"时光账本", sub:"你的记忆宝库", c:"#F5A623", cs:"rgba(245,166,35,.14)", pct:74,
+      num:"4827 张", cap:"今年拍下的照片",
+      text:"今年你拍了 <b>4827 张照片</b>。其中你和妈妈有一张合影，是 5 月回家时拍的——<b>那张照片里，她笑得很开心。</b>这些瞬间，是你人生真正的财富。",
+      metrics:[{n:"4827",l:"照片总数"},{n:"1张",l:"和妈妈的合影"},{n:"5月",l:"那次回家"}],
+      inv:"下次回家，要不要多拍几张？", act:"妈妈笑起来的样子，值得被记住",
+      share:{e:"📸",num:"4827 张",tx:"今年我记录下的时光",bg:"linear-gradient(135deg,#FFB93E,#F09A12)"}},
+    {id:"gift", ic:"🎁", nm:"心意账本", sub:"你的钱在替你表达爱", c:"#A97BFF", cs:"rgba(169,123,255,.13)", pct:68,
+      num:"17,300 元", cap:"今年花在家人身上的心意",
+      text:"今年你在自己身上的投资：健身 2400、课程 1800、书 620。你在家人身上的心意：给爸妈 3200、给孩子 8700、给伴侣 5400。<b>你把最多的钱，花在了家人和体验上，这很好。</b>",
+      metrics:[{n:"4820",l:"投资自己"},{n:"17300",l:"给家人"},{n:"23100",l:"体验生活"}],
+      inv:"你的钱在告诉你，你真正重视什么。", act:"看看我的年度心意地图",
+      share:{e:"🎁",num:"17,300 元",tx:"今年我花在家人身上的心意",bg:"linear-gradient(135deg,#B98CFF,#9663F0)"}}
+  ];
+
+  function bookById(id){for(var i=0;i<BOOKS.length;i++){if(BOOKS[i].id===id)return BOOKS[i];}return null;}
+
+  // ---------- render: home grid (shared by hero + demo) ----------
+  function homeHTML(compact){
+    var h = '<div class="scr">';
+    h += '<div class="greet">早安，这是你认真活过的证据<b>我的一年 · 拾光</b></div>';
+    h += '<div class="yr-pill" data-act="report">✨ 打开我的 2026 年度报告</div>';
+    h += '<div class="mini-grid">';
+    for(var i=0;i<BOOKS.length;i++){
+      var b=BOOKS[i];
+      h += '<div class="mb" data-open="'+b.id+'">'
+        + '<span class="ic">'+b.ic+'</span>'
+        + '<div class="nm">'+b.nm+'</div>'
+        + '<div class="sb">'+b.sub+'</div>'
+        + '<div class="bar"><i style="width:'+b.pct+'%;background:'+b.c+'"></i></div>'
+        + '</div>';
+    }
+    h += '</div>';
+    h += '<div style="text-align:center;font-size:11px;color:#b9ab9a;margin-top:16px;font-weight:600">全部自动生成 · 你没有记录过任何一条</div>';
+    h += '</div>';
+    return h;
+  }
+
+  // ---------- render: detail ----------
+  function detailHTML(b){
+    var h = '<div class="scr">';
+    h += '<div class="back" data-act="home">‹ 返回我的一年</div>';
+    h += '<div class="d-hero" style="background:'+b.share.bg+'">'
+      + '<div class="big"><span class="e">'+b.ic+'</span>'+b.nm+'</div>'
+      + '<div class="num">'+b.num+'</div>'
+      + '<div class="cap">'+b.cap+'</div>'
+      + '</div>';
+    h += '<div class="d-text">'+b.text+'</div>';
+    h += '<div class="d-metrics">';
+    for(var i=0;i<b.metrics.length;i++){
+      var m=b.metrics[i];
+      h += '<div class="m"><b style="color:'+b.c+'">'+m.n+'</b><span>'+m.l+'</span></div>';
+    }
+    h += '</div>';
+    h += '<div class="invite">💌 <b>拾光想对你说：</b>'+b.inv+'<br><span class="act" data-act="toast">'+b.act+'</span></div>';
+    h += '<div class="share-btn" data-share="'+b.id+'">🎴 生成我的成就分享卡片</div>';
+    h += '</div>';
+    return h;
+  }
+
+  // ---------- render: annual report ----------
+  function reportHTML(){
+    var h='<div class="scr">';
+    h+='<div class="back" data-act="home">‹ 返回我的一年</div>';
+    h+='<div class="d-hero" style="background:linear-gradient(135deg,#FFB86B,#FF7A59)">'
+      +'<div class="big"><span class="e">✨</span>我的 2026</div>'
+      +'<div class="num" style="font-size:26px">认真活过的一年</div>'
+      +'<div class="cap">年度关键词 · 坚持 / 陪伴 / 突破</div></div>';
+    h+='<div class="d-text">这一年，你在<b>热爱</b>里投入了 412 小时，在<b>成长</b>里打满 67 次网球，在<b>健康</b>里把睡眠找回了 0.9 小时。也有 <b>34 通</b>妈妈的电话没接到、<b>1 张</b>和她的合影——这些都是拾光想陪你看见的。</div>';
+    var tops=[["🎾","网球 67 次","2.5 → 3.5"],["🌙","睡眠 +0.9h","深睡 +23%"],["❤️","为家人做饭","156 顿"],["🗺️","新足迹","12 个地方"]];
+    h+='<div class="mini-grid">';
+    for(var i=0;i<tops.length;i++){
+      h+='<div class="mb" style="cursor:default"><span class="ic">'+tops[i][0]+'</span><div class="nm">'+tops[i][1]+'</div><div class="sb" style="color:#F2703F;font-weight:700">'+tops[i][2]+'</div></div>';
+    }
+    h+='</div>';
+    h+='<div class="invite">🌱 <b>明年，拾光陪你试试：</b>把和家人的相处，再多一点点。<br><span class="act" data-act="toast">设为我的 2027 心愿</span></div>';
+    h+='<div class="share-btn" data-share="report">🎴 生成我的年度分享卡片</div>';
+    h+='</div>';
+    return h;
+  }
+
+  // ---------- share card ----------
+  function shareCardHTML(s, big){
+    var w = big? 'width:290px':'';
+    return '<div class="scard modal-in" style="'+(big?'width:290px':'')+';background:'+s.bg+'">'
+      +'<div class="se">'+s.e+'</div>'
+      +'<div class="snum">'+s.num+'</div>'
+      +'<div class="stx">'+s.tx+'</div>'
+      +'<div class="sfoot">🌅 拾光 · 我的 2026</div>'
+      +'</div>';
+  }
+
+  // ---------- wire a phone ----------
+  function wirePhone(bodyEl, opts){
+    bodyEl.innerHTML = homeHTML();
+    function go(home){ bodyEl.innerHTML = home; bodyEl.scrollTop=0; }
+    bodyEl.addEventListener("click", function(e){
+      var openEl = e.target.closest("[data-open]");
+      var shareEl = e.target.closest("[data-share]");
+      var actEl = e.target.closest("[data-act]");
+      var pillEl = e.target.closest(".yr-pill");
+      if(openEl){
+        var b=bookById(openEl.getAttribute("data-open"));
+        if(b){ go(detailHTML(b)); if(opts.onStep) opts.onStep(b.id); }
+        return;
+      }
+      if(shareEl){
+        var sid=shareEl.getAttribute("data-share");
+        var s;
+        if(sid==="report"){ s={e:"✨",num:"我的 2026",tx:"坚持 · 陪伴 · 突破",bg:"linear-gradient(135deg,#FFB86B,#FF7A59)"}; }
+        else { var bb=bookById(sid); s=bb.share; }
+        openModal(shareCardHTML(s,true));
+        if(opts.onStep) opts.onStep("share");
+        return;
+      }
+      if(pillEl){ go(reportHTML()); if(opts.onStep) opts.onStep("report"); return; }
+      if(actEl){
+        var a=actEl.getAttribute("data-act");
+        if(a==="home"){ go(homeHTML()); if(opts.onStep) opts.onStep("home"); }
+        else if(a==="toast"){ toast("已记下 · 拾光会温柔地提醒你 💛"); }
+        return;
+      }
+    });
+    return {goHome:function(){go(homeHTML());}, go:function(id){
+      if(id==="home"){go(homeHTML());}
+      else if(id==="report"){go(reportHTML());}
+      else{var b=bookById(id); if(b) go(detailHTML(b));}
+    }};
+  }
+
+  // ---------- modal & toast ----------
+  var modal=document.getElementById("modal"), modalCard=document.getElementById("modalCard");
+  function openModal(html){ modalCard.innerHTML=html; modal.classList.add("on"); }
+  function closeModal(){ modal.classList.remove("on"); }
+  document.getElementById("modalClose").addEventListener("click",closeModal);
+  modal.addEventListener("click",function(e){ if(e.target===modal) closeModal(); });
+  document.getElementById("doShare").addEventListener("click",function(){ closeModal(); toast("已生成分享 · 演示环境未真正发送 ✨"); });
+  document.getElementById("doSave").addEventListener("click",function(){ closeModal(); toast("卡片已保存到相册（演示）🌅"); });
+  var toastEl=document.getElementById("toast"), toastT=null;
+  function toast(msg){ toastEl.textContent=msg; toastEl.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(function(){toastEl.classList.remove("on");},2200); }
+
+  // ---------- init phones ----------
+  var heroCtl = wirePhone(document.getElementById("heroBody"), {});
+  var demoCtl = wirePhone(document.getElementById("demoBody"), {onStep:function(id){
+    var map={grow:"grow",health:"grow",thanks:"thanks",rel:"thanks",share:"share",report:"share",home:"home"};
+    setActiveStep(map[id]||"home");
+  }});
+
+  // hero auto-rotate through a few books
+  var heroSeq=["grow","thanks","health","map","home"]; var hi=0;
+  setInterval(function(){
+    if(document.hidden) return;
+    var id=heroSeq[hi%heroSeq.length]; hi++;
+    if(id==="home"){ heroCtl.goHome(); } else { heroCtl.go(id); }
+  }, 3200);
+
+  // demo steps nav
+  var steps=document.querySelectorAll(".dstep");
+  function setActiveStep(key){
+    for(var i=0;i<steps.length;i++){ steps[i].classList.toggle("active", steps[i].getAttribute("data-go")===key); }
+  }
+  for(var i=0;i<steps.length;i++){
+    (function(st){ st.addEventListener("click", function(){
+      var g=st.getAttribute("data-go");
+      if(g==="home"){ demoCtl.goHome(); setActiveStep("home"); }
+      else if(g==="grow"){ demoCtl.go("grow"); setActiveStep("grow"); }
+      else if(g==="thanks"){ demoCtl.go("thanks"); setActiveStep("thanks"); }
+      else if(g==="act"){ demoCtl.go("thanks"); setActiveStep("act"); toast("点卡片里的按钮，一键给妈妈回电话 💛"); }
+      else if(g==="share"){ demoCtl.go("grow"); setActiveStep("share"); setTimeout(function(){ var sb=document.querySelector("#demoBody [data-share]"); if(sb) sb.click(); },350); }
+      document.getElementById("demo").scrollIntoView({behavior:"smooth",block:"center"});
+    }); })(steps[i]);
+  }
+
+  // ---------- books grid (page section) ----------
+  var bg=document.getElementById("booksGrid");
+  var bhtml="";
+  for(var k=0;k<BOOKS.length;k++){
+    var b=BOOKS[k];
+    bhtml += '<div class="book fade" style="--c:'+b.c+';--csoft:'+b.cs+'" data-jump="'+b.id+'">'
+      + '<div class="bic">'+b.ic+'</div>'
+      + '<h4>'+b.nm+'</h4><div class="bsub">'+b.sub+'</div>'
+      + '<p>'+b.text.replace(/<[^>]+>/g,"").slice(0,44)+'…</p>'
+      + '<span class="peek">在 Demo 里点开 →</span></div>';
+  }
+  bg.innerHTML=bhtml;
+  var bookEls=document.querySelectorAll("[data-jump]");
+  for(var j=0;j<bookEls.length;j++){
+    (function(el){ el.addEventListener("click", function(){
+      var id=el.getAttribute("data-jump");
+      demoCtl.go(id); setActiveStep("home");
+      document.getElementById("demo").scrollIntoView({behavior:"smooth",block:"center"});
+    }); })(bookEls[j]);
+  }
+
+  // ---------- share preview cards ----------
+  var sp=document.getElementById("sharePreview");
+  var picks=["grow","health","thanks","map"];
+  var sphtml="";
+  for(var m=0;m<picks.length;m++){ sphtml += shareCardHTML(bookById(picks[m]).share,false); }
+  sp.innerHTML=sphtml;
+
+  // ---------- nav stuck + fade in ----------
+  var nav=document.getElementById("nav");
+  window.addEventListener("scroll",function(){ nav.classList.toggle("stuck", window.scrollY>40); },{passive:true});
+  var io=new IntersectionObserver(function(entries){
+    for(var n=0;n<entries.length;n++){ if(entries[n].isIntersecting){ entries[n].target.classList.add("in"); io.unobserve(entries[n].target); } }
+  },{threshold:.14});
+  var fades=document.querySelectorAll(".fade");
+  for(var q=0;q<fades.length;q++){ io.observe(fades[q]); }
+})();
+</script>
+</body>
+</html>
